@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<!-- ============ security ============
+     Content-Security-Policy: scripts/styles/images/fonts/frames only from
+     this origin plus the exact third parties the exhibit uses — the Puter
+     voice SDK (lazy, click-only), Google Fonts, YouTube thumbnails and the
+     nocookie player.  Inline scripts are blocked, object plugins banned,
+     no <base> hijacking.  Hosts derived from the actual js.puter.com/v2
+     bundle (api.puter.com, *.puter.site/.work, puter-net.b-cdn.net CDN,
+     wss://puter.cafe, unpkg polyfill fallback).  frame-ancestors and
+     report-only mode need an HTTP header at deploy time — meta can't carry
+     them. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://js.puter.com https://unpkg.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' https://i.ytimg.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://i.ytimg.com https://*.puter.com https://*.puter.site https://*.puter.work https://puter-net.b-cdn.net wss://puter.cafe wss://*.puter.cafe wss://*.puter.com; media-src 'self' blob: https://*.puter.com https://*.puter.site https://*.puter.work https://puter-net.b-cdn.net; frame-src https://www.youtube-nocookie.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'" />
+<!-- referrer: send only the origin to third parties, never paths/hash -->
+<meta name="referrer" content="strict-origin" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Abandoned but not Forgotten — NASA's Discarded Hardware on the Moon &amp; Mars</title>
+<meta name="description" content="A scrollable, interactive exhibit of every major piece of NASA hardware left behind on the Moon and Mars — its journey, its parts, and its final coordinates." />
+
+<!-- ============ app (PWA) — installable, standalone, offline ============ -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#07090f" />
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Abandoned" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/styles.css" />
+<link rel="stylesheet" href="css/game.css" />
+<link rel="stylesheet" href="css/footage.css" />
+</head>
+<body>
+
+<canvas id="starfield" aria-hidden="true"></canvas>
+
+<div class="progress" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+
+<nav class="rail" id="rail" aria-label="Section navigation"></nav>
+
+<!-- ======================= APP TAB BAR (PWA chrome) ======================= -->
+<nav class="tabbar" id="tabbar" aria-label="App navigation">
+  <button class="tab on" data-tab="home" data-target="hero">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11.5 12 4.2l8.5 7.3"/><path d="M6 10.3V20h12v-9.7"/><path d="M10 20v-4.6h4V20"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="tab" data-tab="missions" data-target="timeline">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 21V4"/><path d="M6.5 5h11l-2.6 3.6L17.5 12h-11"/></svg>
+    <span>Missions</span>
+  </button>
+  <button class="tab" data-tab="maps" data-target="graveyard">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.2"/><path d="M3.8 12h16.4"/><path d="M12 3.8c2.4 2.3 3.7 5 3.7 8.2s-1.3 5.9-3.7 8.2c-2.4-2.3-3.7-5-3.7-8.2S9.6 6.1 12 3.8z"/></svg>
+    <span>Maps</span>
+  </button>
+  <button class="tab" data-tab="sos" data-target="stranded">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19v-2.4"/><path d="M9.5 19v-5.6"/><path d="M14 19v-8.8"/><path d="M18.5 19V6.6"/></svg>
+    <span>SOS</span>
+  </button>
+  <button class="tab" data-tab="video" data-target="footage">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.4"/><path d="M10.2 8.7 15.6 12l-5.4 3.3z"/></svg>
+    <span>Video</span>
+  </button>
+  <button class="tab" data-tab="credits" data-target="foot">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.4"/><path d="M12 11.4v5"/><circle cx="12" cy="7.9" r="1" fill="currentColor" stroke="none"/></svg>
+    <span>Credits</span>
+  </button>
+</nav>
+<button class="install-cta" id="installCta" hidden>⬇ install app</button>
+
+<!-- ============================= HERO ============================= -->
+<section class="hero" id="hero" data-nav="Home">
+  <div class="hero-photo" style="background-image:url('assets/hero-lm.jpg')"></div>
+  <div class="hero-scrim"></div>
+  <div class="hero-inner">
+    <div class="kicker">NASA Space Apps · Abandoned but not Forgotten</div>
+    <h1 class="hero-title">
+      <span class="l1">ABANDONED</span>
+      <span class="l2">BUT NOT</span>
+      <span class="l3">FORGOTTEN</span>
+    </h1>
+    <p class="hero-sub">
+      Sixteen missions. Two worlds. Every stage, rover, heat shield and footpad that
+      humanity ever left behind — where it was abandoned, how it ended, and the exact
+      coordinates where it still lies today.
+    </p>
+    <div class="hero-stats">
+      <div class="stat"><b id="statMissions">16</b><span>missions</span></div>
+      <div class="stat"><b id="statParts">100+</b><span>clickable parts</span></div>
+      <div class="stat"><b>1966→2021</b><span>years of leftovers</span></div>
+    </div>
+    <div class="scroll-cue" aria-hidden="true"><span></span>scroll to begin the journey</div>
+  </div>
+</section>
+
+<!-- ============================= INTRO ============================= -->
+<section class="intro" id="intro" data-nav="The Idea">
+  <div class="intro-inner">
+    <div class="kicker">The premise</div>
+    <h2>Nothing ever really comes back from space.</h2>
+    <div class="intro-cols">
+      <p>
+        A landing is really a slow-motion act of abandonment. First the fairing falls away,
+        then the boosters, then the heat shield, the parachute, the backshell, the descent
+        stage — until the machine that survives is only a fraction of the machine that launched.
+      </p>
+      <p>
+        This exhibit follows each mission <b>from the launch pad to its final resting place</b>:
+        click through the five phases of every journey, click any part of the vehicle to learn
+        its fate, and read the coordinates where it still sits — on the Sea of Tranquility,
+        in Gusev Crater, on the plains of Meridiani.
+      </p>
+    </div>
+    <div class="howto">
+      <div class="howto-item"><b>1</b><span>Scroll through the timeline of missions</span></div>
+      <div class="howto-item"><b>2</b><span>Click the 5 journey phases: launch → cruise → landing → surface → end</span></div>
+      <div class="howto-item"><b>3</b><span>Click any part of the spacecraft to see what happened to it</span></div>
+      <div class="howto-item"><b>4</b><span>Read the final coordinates on the planetary map</span></div>
+      <div class="howto-item"><b>5</b><span>Open the machinery manifest — every satellite, stage, rover and experiment</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= TIMELINE ============================= -->
+<section class="timeline" id="timeline" data-nav="Timeline">
+  <div class="timeline-head">
+    <div class="kicker">The timeline</div>
+    <h2>Fifty-five years of things we left behind</h2>
+    <p class="timeline-hint">drag sideways — click a mission to jump to its story</p>
+  </div>
+  <div class="timeline-track" id="timelineTrack"></div>
+</section>
+
+<!-- ======================= MISSION SLIDES (JS) ======================= -->
+<main id="missions"></main>
+
+<!-- ============================= GRAVEYARD ============================= -->
+<section class="graveyard" id="graveyard" data-nav="The Maps">
+  <div class="grave-head">
+    <div class="kicker">The maps</div>
+    <h2>Two planetary graveyards</h2>
+    <p>Every marker is a real, catalogued resting place. Click one to revisit its mission.</p>
+  </div>
+  <div class="grave-grid">
+    <div class="grave-card" data-target="moon">
+      <div class="grave-title">THE MOON <span id="moonCount"></span></div>
+      <div class="planet-map" id="moonGraveMap">
+        <img src="assets/moon-map.jpg" alt="Lunar topographic map" />
+        <div class="map-grid" aria-hidden="true"></div>
+        <div class="map-markers"></div>
+      </div>
+      <div class="grave-legend">Equirectangular projection · topography after NASA/LRO LOLA</div>
+    </div>
+    <div class="grave-card" data-target="mars">
+      <div class="grave-title">MARS <span id="marsCount"></span></div>
+      <div class="planet-map" id="marsGraveMap">
+        <img src="assets/mars-map.jpg" alt="Mars global mosaic" />
+        <div class="map-grid" aria-hidden="true"></div>
+        <div class="map-markers"></div>
+      </div>
+      <div class="grave-legend">Equirectangular projection · Viking global mosaic MDIM 2.1</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================= STRANDED (mini-game) ========================= -->
+<section class="stranded" id="stranded" data-nav="Stranded">
+  <div class="stranded-inner">
+    <div class="kicker">Bonus // off-world survival sim</div>
+    <h2>S.O.S. — YOU ARE THE DEBRIS NOW</h2>
+    <p class="stranded-lead">
+      You are stranded at a landing site and nobody is coming. Everything humanity
+      ever abandoned is still lying around you — <b>solar arrays, radios, dishes,
+      batteries</b>. Scavenge the wreckage, wire up a transmitter, and get a signal home.
+    </p>
+
+    <div class="game-shell" id="gameShell">
+      <div class="game-head">
+        <span class="gh-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="gh-title">field terminal v2.1 — eva recorder</span>
+        <span class="gh-o2" id="ghO2" aria-label="life support remaining"></span>
+      </div>
+      <div class="game-stage" id="gameStage"></div>
+      <div class="game-log" id="gameLog" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================= FOOTAGE (video archive) ========================= -->
+<section class="footage" id="footage" data-nav="Footage">
+  <div class="footage-inner">
+    <div class="kicker">Mission footage</div>
+    <h2>See it leave. See it end.</h2>
+    <p class="footage-lead">
+      Every mission in the exhibit, twice over: the launch pad and the final movement —
+      touchdown, lunar liftoff, splashdown or last transmission. All 32 clips are hosted
+      on YouTube; every card names its channel and links to the original.
+    </p>
+    <div class="footage-grid" id="footageGrid"></div>
+    <p class="footage-credit">
+      Clips are played from YouTube and remain the property of their channels —
+      use the ↗ link on any card to open the original upload.
+    </p>
+  </div>
+
+  <!-- player lightbox (lives inside the section so the meteor guard covers it) -->
+  <div class="flbx" id="footLightbox" hidden>
+    <button class="flbx-backdrop" id="flbxBd" aria-label="Close player"></button>
+    <div class="flbx-box" role="dialog" aria-modal="true" aria-label="Video player">
+      <div class="flbx-head">
+        <span class="flbx-tag" id="flbxTag"></span>
+        <span class="flbx-title" id="flbxTitle"></span>
+        <a class="flbx-yt" id="flbxYt" href="#" target="_blank" rel="noopener">watch on youtube ↗</a>
+        <button class="flbx-close" id="flbxClose" aria-label="Close">×</button>
+      </div>
+      <div class="flbx-frame" id="flbxFrame"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= FOOTER ============================= -->
+<footer class="foot" id="foot" data-nav="Sources">
+  <div class="foot-inner">
+    <div class="kicker">Sources &amp; credits</div>
+    <p class="foot-lead">
+      Coordinates are LRO/LROC-measured positions for lunar hardware and NASA/JPL landing
+      coordinates for Mars hardware. Where sources disagree or a location is unconfirmed,
+      the exhibit says so.
+    </p>
+    <ul class="foot-src" id="footSources"></ul>
+    <p class="foot-note">
+      Built for the NASA Space Apps Challenge. Imagery: NASA / JPL-Caltech / ASU / NASA-Marshall
+      via Wikimedia Commons (public domain). Topographic map of the Moon: NASA/Goddard (CC0).
+    </p>
+  </div>
+</footer>
+
+<!-- floating narrator -->
+<div class="narrator" id="narratorBar" hidden>
+  <span class="narr-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+  <span class="narr-who" id="narrWho">…</span>
+  <button class="narr-btn" id="narrPause">pause</button>
+  <button class="narr-btn" id="narrStop">stop</button>
+  <button class="narr-btn auto" id="narrAuto">auto ●</button>
+  <button class="narr-btn gemini" id="narrGemini" hidden>✦ enable gemini voice</button>
+</div>
+
+<!-- floating part inspector -->
+<div class="part-pop" id="partPop" hidden>
+  <button class="part-pop-speak" id="partPopSpeak" aria-label="Read this aloud">▶ read</button>
+  <button class="part-pop-close" id="partPopClose" aria-label="Close">×</button>
+  <div class="part-pop-kicker" id="partPopKicker">COMPONENT</div>
+  <h4 id="partPopName"></h4>
+  <p id="partPopDesc"></p>
+  <div class="part-pop-fate">
+    <span>END OF LIFE</span>
+    <p id="partPopFate"></p>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/manifest.js"></script>
+<script src="js/vehicles.js"></script>
+<script src="js/app.js"></script>
+<script src="js/game.js"></script>
+<script src="js/footage.js"></script>
+<script src="js/narrator.js"></script>
+</body>
+</html>

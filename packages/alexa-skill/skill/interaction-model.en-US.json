@@ -1,0 +1,118 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "chaos home",
+      "intents": [
+        { "name": "AMAZON.CancelIntent", "samples": [] },
+        { "name": "AMAZON.HelpIntent", "samples": [] },
+        { "name": "AMAZON.StopIntent", "samples": [] },
+        { "name": "AMAZON.FallbackIntent", "samples": [] },
+        { "name": "AMAZON.NavigateHomeIntent", "samples": [] },
+        {
+          "name": "CheckHealthIntent",
+          "samples": [
+            "health check",
+            "check health",
+            "how healthy is my home",
+            "what is my resilience score",
+            "check my home health",
+            "run a health check",
+            "how resilient is my home",
+            "what is the health of my home",
+            "give me a health report",
+            "resilience score",
+            "how is my home doing"
+          ]
+        },
+        {
+          "name": "RunChaosIntent",
+          "slots": [{ "name": "scenario", "type": "AMAZON.SearchQuery" }],
+          "samples": [
+            "run a chaos simulation",
+            "run a simulation",
+            "simulate {scenario}",
+            "run {scenario}",
+            "inject {scenario}",
+            "test {scenario}",
+            "simulate a {scenario}",
+            "run a {scenario} simulation",
+            "break {scenario}",
+            "run the chaos suite",
+            "run the full suite",
+            "test everything",
+            "chaos test {scenario}",
+            "simulate {scenario} failure",
+            "what happens if {scenario}"
+          ]
+        },
+        {
+          "name": "ExplainFailureIntent",
+          "slots": [{ "name": "routine", "type": "AMAZON.SearchQuery" }],
+          "samples": [
+            "why did {routine} fail",
+            "explain {routine}",
+            "why did {routine} break",
+            "why is {routine} failing",
+            "what went wrong with {routine}",
+            "explain the failure of {routine}",
+            "tell me why {routine} fails",
+            "why did my {routine} routine fail",
+            "explain {routine} routine",
+            "diagnose {routine}",
+            "why is {routine} broken"
+          ]
+        },
+        {
+          "name": "FixRoutinesIntent",
+          "slots": [{ "name": "routine", "type": "AMAZON.SearchQuery" }],
+          "samples": [
+            "fix everything",
+            "fix it",
+            "repair my routines",
+            "repair everything",
+            "auto fix all",
+            "fix all",
+            "fix {routine}",
+            "repair {routine}",
+            "fix my {routine} routine",
+            "make everything green",
+            "heal my home",
+            "solve the failures",
+            "patch the routines",
+            "fix the problems"
+          ]
+        },
+        {
+          "name": "ResetHomeIntent",
+          "samples": [
+            "reset home",
+            "reset everything",
+            "start over",
+            "restore baseline",
+            "clear all faults",
+            "reset the simulation",
+            "back to normal",
+            "restore my home"
+          ]
+        },
+        {
+          "name": "AskChaosIntent",
+          "slots": [{ "name": "question", "type": "AMAZON.SearchQuery" }],
+          "samples": [
+            "ask chaos home {question}",
+            "ask {question}",
+            "question {question}",
+            "tell me {question}",
+            "explain to me {question}",
+            "why {question}",
+            "how do I {question}",
+            "what is {question}",
+            "tell me about {question}",
+            "chaos home {question}",
+            "{question}"
+          ]
+        }
+      ]
+    }
+  }
+}

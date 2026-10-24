@@ -1,0 +1,20 @@
+{
+  "name": "@chaoshome/alexa-skill",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "bundle": "node scripts/build.mjs",
+    "test:local": "npm run bundle && node scripts/test-local.mjs"
+  },
+  "dependencies": {
+    "@chaoshome/core": "*",
+    "@chaoshome/mcp-server": "*"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

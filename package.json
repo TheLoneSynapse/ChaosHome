@@ -1,0 +1,28 @@
+{
+  "name": "chaoshome",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ChaosHome MCP - Chaos Engineering for your smart home. Fault-injection resilience testing for Alexa routines over MCP.",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "dashboard"
+  ],
+  "scripts": {
+    "build": "npm run build -w @chaoshome/core && npm run build -w @chaoshome/agent && npm run build -w @chaoshome/mcp-server && npm run build -w @chaoshome/alexa-skill && npm run build -w chaoshome-dashboard",
+    "bundle:alexa": "npm run bundle -w @chaoshome/alexa-skill",
+    "test:alexa": "npm run test:local -w @chaoshome/alexa-skill",
+    "test": "vitest run",
+    "start": "node packages/mcp-server/dist/index.js",
+    "dev:server": "tsx packages/mcp-server/src/index.ts",
+    "dev:dashboard": "npm run dev -w chaoshome-dashboard",
+    "fixtures": "node scripts/gen-fixtures.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  }
+}
