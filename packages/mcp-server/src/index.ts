@@ -19,25 +19,13 @@ const MCP_PATH = '/mcp';
 
 /* Origins allowed to call the API from a browser: the served dashboard
    (same-origin) and the Vite dev server. Everything else gets no CORS
-   headers, so cross-site pages cannot drive the local server.
-   PUBLIC_ORIGIN / RENDER_EXTERNAL_URL add the deployed origin so the same
-   guard keeps working in production (same-origin POSTs still send Origin). */
+   headers, so cross-site pages cannot drive the local server. */
 const ALLOWED_ORIGINS = new Set([
   `http://localhost:${PORT}`,
   `http://127.0.0.1:${PORT}`,
   'http://localhost:5173',
   'http://127.0.0.1:5173',
 ]);
-for (const extra of [process.env.PUBLIC_ORIGIN, process.env.RENDER_EXTERNAL_URL]) {
-  if (extra) {
-    try {
-      const u = new URL(extra);
-      ALLOWED_ORIGINS.add(u.origin);
-    } catch {
-      /* ignore malformed origins */
-    }
-  }
-}
 const corsOptions = {
   origin: (origin: string | undefined, cb: (err: Error | null, allow?: boolean) => void) => {
     // No Origin header = same-origin or non-browser client (curl, MCP SDK).
