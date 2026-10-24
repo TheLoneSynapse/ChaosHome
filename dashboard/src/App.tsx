@@ -23,12 +23,12 @@ async function post<T>(url: string, body?: unknown): Promise<T> {
 
 type TabId = 'home' | 'sandbox' | 'report' | 'health' | 'assistant';
 
-const TABS: { id: TabId; label: string; icon: string }[] = [
-  { id: 'home', label: 'Home', icon: '\u{1F3E0}' },
-  { id: 'sandbox', label: 'Echo Dot', icon: '\u{1F50A}' },
-  { id: 'report', label: 'Report', icon: '\u{1F4CA}' },
-  { id: 'health', label: 'Health', icon: '\u{1F6E1}️' },
-  { id: 'assistant', label: 'Assistant', icon: '\u{1F916}' },
+const TABS: { id: TabId; label: string }[] = [
+  { id: 'home', label: 'Home' },
+  { id: 'sandbox', label: 'Echo Dot' },
+  { id: 'report', label: 'Report' },
+  { id: 'health', label: 'Health' },
+  { id: 'assistant', label: 'Assistant' },
 ];
 
 export function App() {
@@ -237,7 +237,6 @@ export function App() {
               className={`nav-item ${tab === t.id ? 'active' : ''}`}
               onClick={() => setTab(t.id)}
             >
-              <span className="nav-icon">{t.icon}</span>
               <span className="nav-label">{t.label}</span>
               {t.id === 'report' && failedCount > 0 && <span className="nav-badge">{failedCount}</span>}
               {t.id === 'health' && (

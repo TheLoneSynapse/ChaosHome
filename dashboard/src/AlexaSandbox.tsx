@@ -378,6 +378,40 @@ export function AlexaSandbox({ snapshot, busy, onSelectRoutine, onOpenReport, on
     timers.current.push(window.setTimeout(finish, Math.min(6000, 1100 + text.length * 45)));
   };
 
+  /** Hard-stop: cut off a reply that is playing or about to play (the
+   *  "Alexa, stop" button). Cancels TTS, drops the pending thinking timer,
+   *  acknowledges it in the log, and hands the mic back to hands-free mode. */
+  const stopResponse = () => {
+    if (phaseRef.current !== 'speaking' && phaseRef.current !== 'thinking') return;
+    timers.current.forEach((t) => window.clearTimeout(t));
+    timers.current = [];
+    try {
+      // Fires the utterance's onerror -> deliver's finish() runs its own
+      // cleanup too; both paths are idempotent.
+      window.speechSynthesis.cancel();
+    } catch {
+      /* TTS unavailable */
+    }
+    chime('stop', mutedRef.current);
+    goPhase('idle');
+    if (voiceOnRef.current) {
+      wantRec.current = true;
+      window.setTimeout(startRec, 250);
+    } else {
+      wantRec.current = false;
+    }
+    setLog((l) => [
+      ...l,
+      {
+        id: nextId.current++,
+        kind: 'info' as const,
+        command: '[system]',
+        headline: '⏹ Stopped talking.',
+        details: ['I cut my reply short. Ask me anything else.'],
+      },
+    ]);
+  };
+
   /** Short thinking pause, then show + speak the reply. */
   const respond = (build: () => Omit<Exchange, 'id' | 'command'>, command: string) => {
     timers.current.forEach((t) => window.clearTimeout(t));
@@ -405,9 +439,28 @@ export function AlexaSandbox({ snapshot, busy, onSelectRoutine, onOpenReport, on
   const handleCommand = (raw: string) => {
     const text = raw.trim();
     if (!text) return;
+    const lower = normalize(text);
+
+    // "stop" / "be quiet" cuts off a playing or pending reply; when idle it
+    // just gets a friendly acknowledgement instead of "unknown routine".
+    if (/^(stop|be quiet|quiet|silence|cancel|never ?mind|shut up)$/.test(lower)) {
+      if (phaseRef.current === 'speaking' || phaseRef.current === 'thinking') {
+        stopResponse();
+      } else {
+        respond(
+          () => ({
+            kind: 'info' as const,
+            headline: 'Nothing is playing right now.',
+            details: ['Say a routine like “good night”, or ask me anything.'],
+          }),
+          text
+        );
+      }
+      return;
+    }
+
     if (phaseRef.current !== 'idle' && phaseRef.current !== 'listening') return;
     setInput('');
-    const lower = normalize(text);
 
     if (/\b(help|what can you do|commands)\b/.test(lower)) {
       respond(
@@ -635,6 +688,19 @@ export function AlexaSandbox({ snapshot, busy, onSelectRoutine, onOpenReport, on
             onClick={() => setMuted((m) => !m)}
           >
             {muted ? '🔇 Voice replies off' : '🔊 Voice replies on'}
+          </button>
+          <button
+            type="button"
+            className="echo-voice-btn stop"
+            title={
+              phase === 'speaking' || phase === 'thinking'
+                ? 'Interrupt the Dot and stop the reply right now'
+                : 'Nothing is playing right now - ask me something first'
+            }
+            onClick={stopResponse}
+            disabled={phase !== 'speaking' && phase !== 'thinking'}
+          >
+            ⏹ Stop
           </button>
         </div>
         {voiceErr && <div className="echo-voice-err">{voiceErr}</div>}
