@@ -43,12 +43,17 @@ export function Chat() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text }),
       });
-      const data = (await res.json()) as ChatResponse;
+      const data = (await res.json()) as ChatResponse & { error?: string };
+      // On a non-OK response the server sends { error }, not { reply } - show
+      // that message instead of dumping raw JSON at the user.
+      const reply = res.ok
+        ? (data.reply ?? '(no reply)')
+        : (data.error ?? `Request failed (${res.status}).`);
       setMessages((m) => [
         ...m,
         {
           role: 'assistant',
-          text: data.reply ?? `Error: ${JSON.stringify(data)}`,
+          text: reply,
           mode: data.mode,
           toolCalls: data.toolCalls?.map((t) => ({ name: t.name, summary: t.summary })),
         },

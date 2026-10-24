@@ -40,6 +40,9 @@ interface AlexaEvent {
     attributes?: Record<string, unknown>;
     application?: { applicationId?: string };
   };
+  context?: {
+    System?: { application?: { applicationId?: string } };
+  };
 }
 
 interface AlexaResponse {
@@ -197,10 +200,16 @@ export const handler = async (event: AlexaEvent): Promise<AlexaResponse> => {
   // Skill-ID allowlist: when ALEXA_SKILL_ID is configured, only requests from
   // THIS skill are handled. Anyone who discovers the Lambda ARN cannot drive it
   // with hand-crafted events (which would burn the Gemini quota).
+  // Strict: a missing applicationId is treated as a mismatch, so a minimal
+  // forged envelope (no session/context) cannot slip past the check.
   const expectedAppId = process.env.ALEXA_SKILL_ID;
-  const actualAppId = event?.session?.application?.applicationId;
-  if (expectedAppId && actualAppId && actualAppId !== expectedAppId) {
-    return respond('This skill is not available.', { end: true });
+  if (expectedAppId) {
+    const actualAppId =
+      event?.session?.application?.applicationId ??
+      event?.context?.System?.application?.applicationId;
+    if (actualAppId !== expectedAppId) {
+      return respond('This skill is not available.', { end: true });
+    }
   }
 
   const request = event?.request;

@@ -1,0 +1,19 @@
+# Render blueprint: ChaosHome (Express MCP server + static dashboard).
+#
+# The server is stateful (in-memory simulation + 1s auto-fix tick), so it runs
+# as a persistent web service, not a serverless function.
+services:
+  - type: web
+    name: chaoshome
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      # The server binds 127.0.0.1 by default; Render needs 0.0.0.0.
+      - key: HOST
+        value: 0.0.0.0
+      # Free Gemini key for the assistant (set in the Render dashboard).
+      - key: GEMINI_API_KEY
+        sync: false
