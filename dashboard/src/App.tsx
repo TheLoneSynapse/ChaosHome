@@ -482,7 +482,15 @@ export function App() {
                         )}
                       </div>
                       {r.status === 'fail' && expanded && (
-                        <div className="failures">
+                        <div
+                          className="failures"
+                          onClick={(e) => {
+                            // Keep clicks inside the expanded detail from
+                            // bubbling to the row toggle - reading the chain
+                            // or the help panel must not collapse the row.
+                            e.stopPropagation();
+                          }}
+                        >
                           {r.steps
                             .filter((s) => s.status === 'fail')
                             .map((s, i) => (
@@ -491,11 +499,15 @@ export function App() {
                                   type="button"
                                   className="failure-code"
                                   title="What does this mean?"
-                                  onClick={() =>
+                                  onClick={(e) => {
+                                    // Without this the click reaches the row
+                                    // toggle and closes the very panel this
+                                    // button opens.
+                                    e.stopPropagation();
                                     setOpenCode(
                                       openCode === `${r.routineId}-${i}` ? null : `${r.routineId}-${i}`
-                                    )
-                                  }
+                                    );
+                                  }}
                                 >
                                   {s.label || s.code}{' '}
                                   <span className="code-tag">{s.code} ?</span>
@@ -604,7 +616,7 @@ export function App() {
                     <span className="health-card-value">
                       {health.failingRoutines}/{health.totalRoutines}
                     </span>
-                    <span className="health-card-label">routines broken now - tap to explain</span>
+                    <span className="health-card-label">routines have a weak spot - tap to explain</span>
                   </button>
                   <button
                     type="button"

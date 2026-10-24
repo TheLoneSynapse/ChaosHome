@@ -83,6 +83,6 @@ export const TOOL_PLAIN: Record<string, string> = {
 export const CARD_HELP: Record<string, string> = {
   score: 'How well your home survives things going wrong. 100% = nothing in the tests can break it.',
   runs: 'Out of every test we ran, this many passed. The higher the better.',
-  broken: 'How many routines are broken right now, at this moment.',
+  broken: 'Routines that fail in at least one of our tests. They work right now - these are just the ones most likely to break in real life.',
   situations: 'How many different “what if” situations we tested (devices offline, outages, slow network...).',
 };

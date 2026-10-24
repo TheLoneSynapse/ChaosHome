@@ -478,7 +478,11 @@ export function AlexaSandbox({ snapshot, busy, onSelectRoutine, onOpenReport, on
       return;
     }
 
-    if (/\b(health|status|score|how (is|are))\b/.test(lower)) {
+    // "healthy" and "resilience" must be alternatives of their own: \bhealth\b
+    // does not match "healthy" (no boundary before "y") and "how (is|are)"
+    // does not match "how healthy is ...", which is the exact phrase the
+    // empty-state help and the shield chip tell the user to say.
+    if (/\b(health|healthy|status|score|resilien\w*|how (is|are))\b/.test(lower)) {
       const h = snapshot.suite.health;
       respond(
         () => ({
@@ -486,7 +490,7 @@ export function AlexaSandbox({ snapshot, busy, onSelectRoutine, onOpenReport, on
           headline: `Your home health score is ${Math.round(h.score * 100)} percent.`,
           details: [
             `${h.passedRuns} of ${h.totalRuns} test runs passed.`,
-            `${h.failingRoutines} routine(s) are broken right now.`,
+            `${h.failingRoutines} routine(s) have at least one weak spot in the tests.`,
             'Open the Health tab for the full breakdown.',
           ],
         }),

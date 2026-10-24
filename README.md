@@ -2,6 +2,23 @@
 
 **Chaos engineering for your smart home — explained super simply!**
 
+🌐 **Live site:** https://chaoshome.onrender.com · 📦 **Code:** [TheLoneSynapse/ChaosHome](https://github.com/TheLoneSynapse/ChaosHome)
+
+---
+
+## 🧭 Quick map (jump to any section)
+
+1. [What is this?](#-what-is-this-the-tiny-kid-version)
+2. [What's on the webpage — the 5 tabs](#️-whats-on-the-webpage--the-5-tabs-kid-version)
+3. [What the app is used for](#-what-the-app-is-used-for--why-it-exists)
+4. [Services and technology used](#-services-and-technology-used)
+5. [How to start it (grown-ups)](#-how-to-start-it-for-the-grown-ups)
+6. [Every function, explained like you're 5](#-every-function-explained-like-youre-5)
+7. [The MCP tools](#-the-mcp-tools-what-other-ai-assistants-can-call)
+8. [Where everything lives](#️-where-everything-lives)
+9. [How we know it works](#-how-we-know-it-works)
+10. [Honest gaps](#-honest-gaps-on-purpose) · [Safety rules](#-safety-rules-the-robots-good-manners) · [Environment variables](#-environment-variables-for-the-grown-ups)
+
 ---
 
 ## 🧸 What is this? (the tiny-kid version)
@@ -22,6 +39,52 @@ routine *breaks* — but nobody tells you! It just quietly stops working at 11 P
 4. 🔧 **Fixes it** and then breaks it *again* to make sure the fix really works.
 
 > "Your smart home is code nobody tests. We're Chaos Monkey for Alexa." 🐒
+
+---
+
+## 🖥️ What's on the webpage (the 5 tabs, kid version)
+
+Open the site and you get **five tabs** on the left plus a top bar:
+
+| Tab | What it is | What you do with it |
+|---|---|---|
+| **Home** | A picture of your house — toys (devices) connected by strings (routines). | Tap any circle to see what can break it. Tap a **Simulate a problem** button to break something on purpose — safely, nothing real is touched. |
+| **Echo Dot** | A pretend Alexa speaker that **really talks** (your browser's mic + speaker). | Say or type commands ("good night"), watch them fail when a problem is injected, and tap the red **⏹ Stop** button to cut her off mid-sentence. Say **"Alexa, ..."** with always-listening on. |
+| **Report** | The report card: every routine gets **PASS** or **FAIL**. | Tap a red row to read *why* it failed in plain words (tap the `?` on any error), then **Fix this routine**. Save or restore your favourite setup here. |
+| **Health** | The big score out of 100% + which routines break easiest. | Tap any card to have the number explained like you're five; tap a situation to run that test again. |
+| **Assistant** | A chat box with a real AI brain (Gemini). | Ask *"does Movie Night have problems?"* — it answers **Problems / Causes / How to solve** and then asks *"Should I fix it now?"*. It also checks **on its own** when you open the tab and offers a one-tap **Yes, solve it** button. |
+
+The **top bar** always shows your health score (tap for details), the **Auto-Fix All** button and **Reset home**.
+
+---
+
+## 🎯 What the app is used for (why it exists)
+
+- **Find hidden weak spots** in smart-home routines *before* they fail at 11 PM — renamed devices, dead batteries, internet outages, edited groups.
+- **See the reason, not just "it broke"** — every failure comes with a plain-language story: what happened, why, and how to solve it.
+- **Fix with one tap** — Auto-Fix All, Fix this routine, the assistant's "Yes, solve it", plus a 5-minute auto-fix alarm if you forget.
+- **Keep a good setup** — save the way you like your home, restore it whenever drift happens.
+- **Talk to it** — ask the assistant in chat, or talk to the on-screen Echo Dot with your real voice.
+- **Learn chaos engineering safely** — breaking things on purpose (in a simulation) to make the real thing stronger.
+
+---
+
+## 🧩 Services and technology used
+
+| Service / tool | What it is used for | Cost |
+|---|---|---|
+| **Render** | Hosting the live website + API (web service) | Free tier |
+| **GitHub** | Stores the code; every push is the source of truth | Free |
+| **Google Gemini (AI Studio)** | The assistant's cloud brain (model `gemini-3.1-flash-lite`) | Free key |
+| **AWS Bedrock** (optional) | Alternative brain when no Gemini key is set | pay-as-you-go |
+| **MCP (Model Context Protocol)** | The standard tool-belt that lets other AI assistants call this app | Free, open |
+| **Web Speech API + speechSynthesis** | The Echo Dot tab's real microphone input and spoken replies | Built into Chrome/Edge |
+| **WebAudio** | Alexa-style beeps (activation / success / error) | Built into the browser |
+| **React + Vite** | The dashboard UI | Free, open |
+| **Express (Node.js)** | The web server: REST API + MCP endpoint | Free, open |
+| **TypeScript + Vitest** | Types plus the 31 tests that keep everything working | Free, open |
+
+No database is needed — everything is a safe *simulation* held in the server's memory.
 
 ---
 
