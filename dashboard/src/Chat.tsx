@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import type { ChatResponse } from './types';
+import { useEffect, useRef, useState } from 'react';
+import type { ChatResponse, RepairSummary, Snapshot } from './types';
 import { TOOL_CHIP, TOOL_PLAIN } from './plain';
 
 interface Message {
@@ -15,6 +15,7 @@ const QUICK_ASKS = [
   'How healthy is my home?',
   'Run the safety tests',
   'Why did Good Night break?',
+  'Does any feature have problems?',
   'Fix everything',
 ];
 
@@ -29,6 +30,7 @@ export function Chat() {
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [openChip, setOpenChip] = useState<string | null>(null);
+  const [awaitingFix, setAwaitingFix] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const send = async (presetText?: string) => {
@@ -60,6 +62,87 @@ export function Chat() {
       ]);
     } catch (err) {
       setMessages((m) => [...m, { role: 'assistant', text: `Chat error: ${String(err)}` }]);
+    } finally {
+      setBusy(false);
+      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+    }
+  };
+
+  /* Proactive check (no user interference): on mount, look for features that
+     are failing right now and offer to solve them with one tap. */
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch('/api/state');
+        if (!res.ok) return;
+        const snap = (await res.json()) as Snapshot;
+        const failing = snap.lastReport.results.filter((r) => r.status === 'fail');
+        if (cancelled || failing.length === 0) return;
+        const lines = failing.map((r) => {
+          const step = r.steps.find((s) => s.status === 'fail');
+          return (
+            `- \"${r.routineName}\" stops at \"${step?.label ?? 'a step'}\"` +
+            (step?.code ? ` [${step.code}]` : '') +
+            (step && step.chain.length ? `\n    Cause: ${step.chain.join(' -> ')}` : '')
+          );
+        });
+        setMessages((m) => [
+          ...m,
+          {
+            role: 'assistant',
+            text:
+              `I checked your home on my own and found ${failing.length} feature${failing.length === 1 ? '' : 's'} with problems right now:\n\n` +
+              `${lines.join('\n')}\n\n` +
+              'How to solve: I can repair them automatically (add fallbacks, relink renamed devices, remove broken dependencies) and re-run the tests to confirm.\n\n' +
+              'Should I solve it for you?',
+          },
+        ]);
+        setAwaitingFix(true);
+        setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+      } catch {
+        /* proactive check is best-effort - never break the chat */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /** One-tap repair from the diagnosis offer: runs the same /api/repair the
+   *  topbar Auto-Fix button uses, then reports what changed. */
+  const solveIt = async () => {
+    if (busy) return;
+    setAwaitingFix(false);
+    setMessages((m) => [...m, { role: 'user', text: 'Yes, solve it for me' }]);
+    setBusy(true);
+    try {
+      const res = await fetch('/api/repair', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const data = (await res.json()) as { repair?: RepairSummary; error?: string };
+      if (!res.ok || !data.repair) throw new Error(data.error ?? `request failed (${res.status})`);
+      const r = data.repair;
+      const applied = r.applied.map((a) => `- ${a.routineId}: ${a.description}`).join('\n');
+      setMessages((m) => [
+        ...m,
+        {
+          role: 'assistant',
+          text: r.applied.length
+            ? `Done - I fixed ${r.applied.length} problem${r.applied.length === 1 ? '' : 's'} for you and re-tested everything:\n\n${applied}\n\nHealth score: ${Math.round(r.healthBefore)}% -> ${Math.round(r.healthAfter)}%.`
+            : 'I checked, but there was nothing safe to repair automatically - the failures need a change on your side (for example re-adding a device in your smart-home app). See the Report tab for the details.',
+          toolCalls: r.applied.length
+            ? [{ name: 'apply_fix', summary: `${r.applied.length} repair(s) applied` }]
+            : [],
+        },
+      ]);
+    } catch (err) {
+      setMessages((m) => [
+        ...m,
+        { role: 'assistant', text: `Could not run the repair: ${String(err)}` },
+      ]);
     } finally {
       setBusy(false);
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
@@ -122,6 +205,26 @@ export function Chat() {
                       : []),
                   ];
                 })}
+              </div>
+            )}
+            {awaitingFix && i === messages.length - 1 && (
+              <div className="fix-offer">
+                <button
+                  type="button"
+                  className="fix-yes"
+                  disabled={busy}
+                  onClick={() => void solveIt()}
+                >
+                  Yes, solve it
+                </button>
+                <button
+                  type="button"
+                  className="fix-no"
+                  disabled={busy}
+                  onClick={() => setAwaitingFix(false)}
+                >
+                  Not now
+                </button>
               </div>
             )}
           </div>
