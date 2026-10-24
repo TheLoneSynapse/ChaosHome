@@ -19,3 +19,6 @@ Thumbs.db
 # Freebuff workspace state + local runtime files
 .freebuff/
 preview-server.pid
+
+# Separate project (not part of ChaosHome)
+nasA/
