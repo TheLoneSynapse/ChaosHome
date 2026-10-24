@@ -292,20 +292,6 @@ before you ship it.
 
 ---
 
-### 🌌 The `nasA` exhibit — `nasA/`
-*A separate, self-contained space-history exhibit site (static HTML/JS).*
-
-| Piece | What it does (kid version) |
-|---|---|
-| `js/app.js` | The main page: draws missions, the vehicle diagrams, the graveyard maps, and handles clicks. |
-| `js/data.js` | All the **facts and stories** about missions — just data, no logic. |
-| `js/footage.js` | Loads and plays the **video clips** in a grid. |
-| `js/game.js` | A tiny **interactive game** on the page. Uses `esc()` to keep any text safe. |
-| `js/narrator.js` | The **voice-over** that reads sections aloud and scrolls with you. |
-| `tools/gen-icons.mjs` | A build helper that **generates the little icons**. |
-
----
-
 ## 🧰 The MCP tools (what other AI assistants can call)
 
 These are the "toys" we hand to any MCP-compatible assistant:
@@ -333,7 +319,6 @@ packages/mcp-server/  the receptionist: MCP door + web routes + serves the pictu
 packages/agent/       the brain: online cloud brain + offline backup brain
 packages/alexa-skill/ the same brain, talking through an Echo Dot
 dashboard/            the picture on screen (graph, report, chat, Echo Dot)
-nasA/                 a separate space-history exhibit site
 fixtures/             sample-home.json (the pretend house in data form)
 scripts/              helper scripts (verify the protocol, generate fixtures)
 docs/                 integration guides for MCP and AWS
